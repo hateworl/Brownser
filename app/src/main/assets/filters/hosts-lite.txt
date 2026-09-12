@@ -1,0 +1,9 @@
+# Lista de hosts de exemplo (formato StevenBlack simplificado)
+# Substituir por download automático da lista completa via WorkManager
+0.0.0.0 doubleclick.net
+0.0.0.0 googlesyndication.com
+0.0.0.0 googleadservices.com
+0.0.0.0 ads.yahoo.com
+0.0.0.0 advertising.com
+0.0.0.0 adnxs.com
+0.0.0.0 scorecardresearch.com

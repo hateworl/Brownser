@@ -1,0 +1,12 @@
+! Lista de filtros de exemplo (formato Adblock Plus simplificado)
+! Substituir por download automático da EasyList/EasyPrivacy completa via WorkManager
+||doubleclick.net^
+||googlesyndication.com^
+||googleadservices.com^
+||adservice.google.com^
+||ads.yahoo.com^
+||advertising.com^
+||adnxs.com^
+||scorecardresearch.com^
+||taboola.com^
+||outbrain.com^
