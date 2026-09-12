@@ -45,7 +45,7 @@ android {
 
 dependencies {
     // GeckoView - engine do navegador (Mozilla)
-    implementation("org.mozilla.geckoview:geckoview:129.0.20240826141754")
+    implementation("org.mozilla.geckoview:geckoview:155.0.20260903215306")
 
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2024.09.00"))
