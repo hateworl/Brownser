@@ -1,27 +1,29 @@
 package com.taiji.browser.adblock
 
 import android.content.Context
+import android.util.Log
+import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.WebRequestError
-import org.mozilla.geckoview.AllowOrDeny
 
 /**
  * Bloqueador de anúncios baseado em listas de filtros (EasyList / EasyPrivacy).
- * Intercepta cada requisição de rede da GeckoSession e nega as que baterem
- * com os padrões carregados.
- *
- * As listas devem ser baixadas periodicamente (WorkManager) e cacheadas em
- * disco; aqui carregamos de um arquivo local em assets/filters/ como base inicial.
+ * Também expõe erros de carregamento de página via callback, para diagnóstico.
  */
 class FilterListBlocker(context: Context) {
 
-    // Conjunto de domínios/padrões compilados das listas de filtro.
-    // Em produção: parsear regras completas no formato Adblock Plus (||domain^, etc.)
     private val blockedPatterns: Set<Regex> = loadDefaultFilters(context)
 
-    fun attachTo(session: GeckoSession) {
-        session.contentDelegate = object : GeckoSession.ContentDelegate {}
+    fun attachTo(session: GeckoSession, onPageError: ((String) -> Unit)? = null) {
+        session.contentDelegate = object : GeckoSession.ContentDelegate {
+            override fun onCrash(session: GeckoSession) {
+                val msg = "O motor do navegador travou (crash na GeckoSession)."
+                Log.e("TaijiBrowser", msg)
+                onPageError?.invoke(msg)
+            }
+        }
+
         session.navigationDelegate = object : GeckoSession.NavigationDelegate {
             override fun onLoadRequest(
                 session: GeckoSession,
@@ -32,6 +34,30 @@ class FilterListBlocker(context: Context) {
                     GeckoResult.fromValue(AllowOrDeny.DENY)
                 } else {
                     GeckoResult.fromValue(AllowOrDeny.ALLOW)
+                }
+            }
+
+            override fun onLoadError(
+                session: GeckoSession,
+                uri: String?,
+                error: WebRequestError
+            ): GeckoResult<String>? {
+                val msg = "Erro ao carregar $uri — categoria=${error.category}, código=${error.code}"
+                Log.e("TaijiBrowser", msg)
+                onPageError?.invoke(msg)
+                return GeckoResult.fromValue(null)
+            }
+        }
+
+        session.progressDelegate = object : GeckoSession.ProgressDelegate {
+            override fun onPageStart(session: GeckoSession, url: String) {
+                Log.d("TaijiBrowser", "onPageStart: $url")
+            }
+
+            override fun onPageStop(session: GeckoSession, success: Boolean) {
+                Log.d("TaijiBrowser", "onPageStop: success=$success")
+                if (!success) {
+                    onPageError?.invoke("A página parou de carregar sem sucesso (onPageStop success=false).")
                 }
             }
         }
@@ -51,7 +77,6 @@ class FilterListBlocker(context: Context) {
     }
 
     private fun rulePatternToRegex(rule: String): Regex {
-        // Conversão simplificada de sintaxe Adblock Plus (||domain^) para regex.
         val escaped = rule
             .replace("||", "")
             .replace("^", "")
