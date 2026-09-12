@@ -2,6 +2,8 @@ package com.taiji.browser.browser
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -97,21 +99,11 @@ fun BrowserBar(
     }
 }
 
+@Composable
 private fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = this.then(
     Modifier.clickable(
+        interactionSource = remember { MutableInteractionSource() },
         indication = null,
-        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
         onClick = onClick
     )
-)
-
-// import necessário para o clickable customizado acima
-private fun Modifier.clickable(
-    indication: androidx.compose.foundation.Indication?,
-    interactionSource: androidx.compose.foundation.interaction.MutableInteractionSource,
-    onClick: () -> Unit
-): Modifier = androidx.compose.foundation.clickable(
-    interactionSource = interactionSource,
-    indication = indication,
-    onClick = onClick
 )

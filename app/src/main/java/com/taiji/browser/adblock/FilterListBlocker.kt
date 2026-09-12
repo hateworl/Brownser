@@ -4,6 +4,7 @@ import android.content.Context
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.WebRequestError
+import org.mozilla.geckoview.AllowOrDeny
 
 /**
  * Bloqueador de anúncios baseado em listas de filtros (EasyList / EasyPrivacy).
@@ -25,12 +26,12 @@ class FilterListBlocker(context: Context) {
             override fun onLoadRequest(
                 session: GeckoSession,
                 request: GeckoSession.NavigationDelegate.LoadRequest
-            ): GeckoResult<GeckoSession.NavigationDelegate.AllowOrDeny>? {
+            ): GeckoResult<AllowOrDeny>? {
                 val blocked = blockedPatterns.any { it.containsMatchIn(request.uri) }
                 return if (blocked) {
-                    GeckoResult.fromValue(GeckoSession.NavigationDelegate.AllowOrDeny.DENY)
+                    GeckoResult.fromValue(AllowOrDeny.DENY)
                 } else {
-                    GeckoResult.fromValue(GeckoSession.NavigationDelegate.AllowOrDeny.ALLOW)
+                    GeckoResult.fromValue(AllowOrDeny.ALLOW)
                 }
             }
         }
