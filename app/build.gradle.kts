@@ -43,10 +43,10 @@ kotlin {
 
 dependencies {
     // GeckoView - engine do navegador (Mozilla)
-    implementation("org.mozilla.geckoview:geckoview:155.0.20260903215306")
+    implementation("org.mozilla.geckoview:geckoview:")
 
     // Jetpack Compose
-    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+    implementation(platform("androidx.compose:compose-bom:2026.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
