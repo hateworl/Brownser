@@ -30,6 +30,7 @@ class MainActivity : ComponentActivity() {
 
         geckoSession = GeckoSession(GeckoSessionSettings.Builder().usePrivateMode(false).build())
         geckoSession.open(app.geckoRuntime)
+        geckoSession.setActive(true) // <-- sem isso o GeckoView não desenha nada na tela
         FilterListBlocker(this).attachTo(geckoSession)
 
         setContent {
@@ -44,7 +45,6 @@ class MainActivity : ComponentActivity() {
                         blockedCount = 0, // TODO: contador vindo do FilterListBlocker
                         onUrlSubmit = { newUrl ->
                             currentUrl = newUrl
-                            // Antes de carregar no navegador, tenta abrir no app nativo
                             if (!integrationManager.tryOpenInNativeApp(newUrl)) {
                                 geckoSession.loadUri(newUrl)
                             }
@@ -67,6 +67,16 @@ class MainActivity : ComponentActivity() {
         }
 
         geckoSession.loadUri("https://www.google.com")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::geckoSession.isInitialized) geckoSession.setActive(true)
+    }
+
+    override fun onPause() {
+        if (::geckoSession.isInitialized) geckoSession.setActive(false)
+        super.onPause()
     }
 
     override fun onDestroy() {
